@@ -3,10 +3,8 @@ package lab7;
 import java.util.Scanner;
 
 public class PetAdoption {
-	private static treeNode root = null;
-	private static int min = 2147483647;
-	private static treeNode closest = null;
-	private static int answer = 0;
+	private static treeNodeF root = null;
+	private static long ans = 0;
 	public static void main(String[] args) {
 		Scanner in = new Scanner(System.in);
 		int n = in.nextInt();
@@ -21,6 +19,7 @@ public class PetAdoption {
 					isPetTree = false;
 				}
 			}
+			
 			if(a == 0 && isPetTree) {
 				insertion(b);
 			} else if(a == 1 && isPetTree) {
@@ -30,41 +29,67 @@ public class PetAdoption {
 			} else if(a == 0 && !isPetTree) {
 				findClosest(b);
 			}
+			
 		}
-		System.out.println(answer);
+		System.out.println(ans);
 	}
+	
+	
 	
 	public static void findClosest(int num) {
-		preOrder(num, root);
-		if(min != 2147483647) {
-			answer += min;
-			delete(closest.value);
-			min = -1;
-			closest = null;
-		}
+		treeNodeF close = closest(root, num);
+		ans += Math.abs(num - close.value);
+		delete(close.value);
 	}
 	
-	public static void preOrder(int num, treeNode root) {
-		if(root == null)
-			return;
-		if(Math.abs(num-root.value) < min) {
-			min = Math.abs(num-root.value);
-			closest = root;
+	public static treeNodeF closest(treeNodeF root, int num) {
+		if(root == null || root.value == num)
+			return root;
+		if(num > root.value) {
+			treeNodeF right = closest(root.right, num);
+			if(right != null) {
+				if(Math.abs(num - root.value) < Math.abs(num - right.value)) {
+					return root;
+				} else if(Math.abs(num - root.value) == Math.abs(num - right.value)) {
+					if(root.value < right.value) {
+						return root;
+					} else {
+						return right;
+					}
+				} else {
+					return right;
+				}
+			} else {
+				return root;
+			}
+		} else {
+			treeNodeF left = closest(root.left, num);
+			if(left != null) {
+				if(Math.abs(num - root.value) < Math.abs(num - left.value)) {
+					return root;
+				} else if(Math.abs(num - root.value) == Math.abs(num - left.value)) {
+					if(root.value < left.value) {
+						return root;
+					} else {
+						return left;
+					}
+				} else {
+					return left;
+				}
+			} else {
+				return root;
+			}
 		}
-		if(root.left != null)
-			preOrder(num, root.left);
-		if(root.right != null)
-			preOrder(num, root.right);
 	}
 	
 	public static void insertion(int num) {
-		treeNode tar = new treeNode(num);
+		treeNodeF tar = new treeNodeF(num);
 		if(root == null) {
 			root = tar;
 			root.height = setHeight(root);
 			root.sonAmount = setAmount(root);
 		} else {
-			treeNode temp = root;
+			treeNodeF temp = root;
 			while(true) {
 				if(num < temp.value) {
 					if(temp.left != null) {
@@ -105,10 +130,10 @@ public class PetAdoption {
 		}
 	}
 	
-	public static void L_Rotate(treeNode parent) {
-		treeNode R_Child = parent.right;
-		treeNode RL_Child = R_Child.left;
-		treeNode upper = parent.parent;
+	public static void L_Rotate(treeNodeF parent) {
+		treeNodeF R_Child = parent.right;
+		treeNodeF RL_Child = R_Child.left;
+		treeNodeF upper = parent.parent;
 		
 		parent.right = RL_Child;
 		if(RL_Child != null) {
@@ -138,10 +163,10 @@ public class PetAdoption {
 		R_Child.sonAmount = setAmount(R_Child);
 	}
 	
-	public static void R_Rotate(treeNode parent) {
-		treeNode L_Child = parent.left;
-		treeNode LR_Child = L_Child.right;
-		treeNode upper = parent.parent;
+	public static void R_Rotate(treeNodeF parent) {
+		treeNodeF L_Child = parent.left;
+		treeNodeF LR_Child = L_Child.right;
+		treeNodeF upper = parent.parent;
 		
 		parent.left = LR_Child;
 		if(LR_Child != null) {
@@ -171,24 +196,24 @@ public class PetAdoption {
 		L_Child.sonAmount = setAmount(L_Child);
 	}
 	
-	public static void LR_Rotate(treeNode parent) {
+	public static void LR_Rotate(treeNodeF parent) {
 		L_Rotate(parent.left);
 		R_Rotate(parent);
 	}
 	
-	public static void RL_Rotate(treeNode parent) {
+	public static void RL_Rotate(treeNodeF parent) {
 		R_Rotate(parent.right);
 		L_Rotate(parent);
 	}
 	
 	public static void delete(int num) {
-		treeNode tar = findPos(num);
+		treeNodeF tar = findPos(num);
 		if(tar != null) {
-			treeNode parent = tar.parent;
+			treeNodeF parent = tar.parent;
 			if(tar.left == null && tar.right == null) {
 				delete_leaf(tar);
 			} else if(tar.right != null){
-				treeNode succ = tar.right;
+				treeNodeF succ = tar.right;
 				while(succ.left != null)
 					succ = succ.left;
 				tar.value = succ.value;
@@ -196,7 +221,7 @@ public class PetAdoption {
 				if(succ.left == null && succ.right == null) {
 					delete_leaf(succ);
 				} else {
-					treeNode rightChild = succ.right;
+					treeNodeF rightChild = succ.right;
 					succ.value = rightChild.value;
 					succ.left = rightChild.left;
 					if(rightChild.left != null)
@@ -208,7 +233,7 @@ public class PetAdoption {
 					succ.height--;
 				}
 			} else {
-				treeNode leftChild = tar.left;
+				treeNodeF leftChild = tar.left;
 				tar.value = leftChild.value;
 				tar.left = leftChild.left;
 				if(leftChild.left != null)
@@ -241,7 +266,7 @@ public class PetAdoption {
 		}
 	}
 	
-	public static void delete_leaf(treeNode tar) {
+	public static void delete_leaf(treeNodeF tar) {
 		if(tar.parent == null) {
 			tar = null;
 			root = null;
@@ -255,8 +280,8 @@ public class PetAdoption {
 		}
 	}
 	
-	public static treeNode findPos(int num) {
-		treeNode cur = root;
+	public static treeNodeF findPos(int num) {
+		treeNodeF cur = root;
 		while(true) {
 			if(num > cur.value) {
 				if(cur.right != null) {
@@ -277,9 +302,9 @@ public class PetAdoption {
 		}
 	}
 	
-	public static treeNode getKth(treeNode root, int k) {
-		treeNode ans = null;
-		treeNode temp = root;
+	public static treeNodeF getKth(treeNodeF root, int k) {
+		treeNodeF ans = null;
+		treeNodeF temp = root;
 		while(true) {
 			if(k < getAmount(temp.left) + 2) {
 				temp = temp.left;
@@ -294,11 +319,11 @@ public class PetAdoption {
 		return ans;
 	}
 	
-	public static int setHeight(treeNode tar) {
+	public static int setHeight(treeNodeF tar) {
 		return Math.max(getHeight(tar.left), getHeight(tar.right)) + 1;
 	}
 	
-	public static int getHeight(treeNode tar) {
+	public static int getHeight(treeNodeF tar) {
 		if(tar == null) {
 			return -1;
 		} else {
@@ -306,11 +331,11 @@ public class PetAdoption {
 		}
 	}
 	
-	public static int setAmount(treeNode tar) {
+	public static int setAmount(treeNodeF tar) {
 		return getAmount(tar.left) + getAmount(tar.right) + 2;
 	}
 	
-	public static int getAmount(treeNode tar) {
+	public static int getAmount(treeNodeF tar) {
 		if(tar == null) {
 			return -1;
 		} else {
@@ -320,14 +345,14 @@ public class PetAdoption {
 	
 }
 
-class treeNode{
+class treeNodeF{
 	int value;
 	int height;
 	int sonAmount;
-	treeNode parent;
-	treeNode left;
-	treeNode right;
-	public treeNode(int val) {
+	treeNodeF parent;
+	treeNodeF left;
+	treeNodeF right;
+	public treeNodeF(int val) {
 		this.value = val;
 	}
 }
