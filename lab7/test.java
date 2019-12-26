@@ -6,25 +6,24 @@ import java.util.ArrayList;
 
 public class test {
 	public static void main(String[] args) throws FileNotFoundException {
-		int n = 10000;
+		int n = 80000;
 		int count = 0;
-		int x = 3789;
 		ArrayList<Integer> list = new ArrayList<>();
 		PrintWriter write = new PrintWriter("E:\\test.txt");
+		write.print(n + " ");
 		while(count < n) {
+			int petOrAdopter = (int)(Math.random()*2);
+/*			if(count % 2 == 0)
+				petOrAdopter = 0;
+			else
+				petOrAdopter = 1;*/
+			
 			int num = (int)(Math.random()*2147483647);
 			if(!list.contains(num)) {
-				write.print(num + " ");
+				write.print(petOrAdopter + " " + num + " ");
 				count++;
 			}
 			list.add(num);
-		}
-		for(int i=0; i<n-x+1; i++) {
-			int num = (int)(Math.random()*x);
-			if(num <= 0)
-				write.print(1 + " ");
-			else
-				write.print(num + " ");
 		}
 		write.close();
 	}
